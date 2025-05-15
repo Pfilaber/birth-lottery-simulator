@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Birth Lottery Simulator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #eef2f5;
+      padding: 2rem;
+      text-align: center;
+    }
+    .card {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      margin: auto;
+    }
+    h1 {
+      font-size: 1.8rem;
+    }
+    button {
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #result {
+      margin-top: 1.5rem;
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🌍 Birth Lottery Simulator</h1>
+    <p>Click below to simulate where you'd be born based on global birth distribution.</p>
+    <button onclick="drawCountry()">🎲 Pick Country</button>
+    <div id="result">Loading data...</div>
+  </div>
+
+  <script>
+    let countries = [];
+
+    fetch('full_birth_data_2023.json')
+      .then(response => response.json())
+      .then(data => {
+        countries = data;
+        document.getElementById("result").innerText = "Ready! Click the button above.";
+      })
+      .catch(error => {
+        document.getElementById("result").innerText = "Failed to load country data.";
+        console.error("Error loading JSON:", error);
+      });
+
+    function drawCountry() {
+      if (!countries.length) {
+        document.getElementById("result").innerText = "Data not loaded yet.";
+        return;
+      }
+
+      const total = countries.reduce((sum, c) => sum + c.births, 0);
+      let rand = Math.random() * total;
+      for (const country of countries) {
+        if (rand < country.births) {
+          document.getElementById("result").innerHTML =
+            `🎉 You were born in <strong>${country.name}</strong>!`;
+          return;
+        }
+        rand -= country.births;
+      }
+    }
+  </script>
+</body>
+</html>
